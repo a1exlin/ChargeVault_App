@@ -2,14 +2,15 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider } from 'react-redux';
-import { store } from './components/store';
+import {store} from './components/store';
 
 // Import your screens
 import LoginScreen from './components/login';
-import HomeScreen from './components/home';
 import SignupScreen from './components/signup';
+import HomeScreen from './components/home';
 import SlotList from './components/getSlot';
 import AccessHistoryScreen from './components/accessHistory';
+import NavBar from './components/navBar'; // optional if used
 
 export type RootStackParamList = {
   Login: undefined;
@@ -28,8 +29,7 @@ export default function App() {
         <Stack.Navigator
           initialRouteName="Login"
           screenOptions={{
-            headerShown: true,
-            headerTitleAlign: 'center',
+            headerShown: false,
           }}
         >
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -42,4 +42,3 @@ export default function App() {
     </Provider>
   );
 }
-

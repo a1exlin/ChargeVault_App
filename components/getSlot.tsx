@@ -3,48 +3,40 @@ import {
   View,
   Text,
   TouchableOpacity,
+  ScrollView,
   StyleSheet,
-  FlatList,
   ActivityIndicator,
+  Button,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { checkToken } from './utils/auth'; // adjust path if needed
+import { SERVER_URI } from '@env';
+import { checkToken } from './utils/auth';
 
-interface Slot {
-  id: number;
-  status: string;
-  ufid?: string;
-}
-
-export default function SlotList() {
-  const [slots, setSlots] = useState<Slot[]>([]);
+export default function ReserveSlot() {
+  const [slots, setSlots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState<string | null>(null);
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+  const [userId, setUserId] = useState('');
 
   useEffect(() => {
     const runTokenCheck = async () => {
       const isValid = await checkToken();
+      const username = await AsyncStorage.getItem('username');
+      setUserId(username || '');
+
       if (!isValid) {
-        navigation.navigate('Login' as never);
+        navigation.navigate('Login');
       }
     };
-    runTokenCheck();
-  }, []);
 
-  useEffect(() => {
-    const loadUsername = async () => {
-      const stored = await AsyncStorage.getItem('username');
-      setUsername(stored);
-    };
-    loadUsername();
+    runTokenCheck();
   }, []);
 
   useEffect(() => {
     const fetchSlots = async () => {
       try {
-        const response = await fetch('http://localhost:3001/api/getSlots', {
+        const response = await fetch(`${SERVER_URI}/api/getSlots`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -62,13 +54,13 @@ export default function SlotList() {
     fetchSlots();
   }, []);
 
-  const reserveSlot = async (slot: Slot) => {
+  const reserveSlot = async (slot: any) => {
     try {
-      const response = await fetch('http://localhost:3001/api/reserve', {
+      const response = await fetch(`${SERVER_URI}/api/reserve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ufid: username,
+          ufid: userId,
           slotID: slot.id,
           status: 'reserved',
         }),
@@ -78,7 +70,7 @@ export default function SlotList() {
       if (result.success) {
         setSlots((prev) =>
           prev.map((s) =>
-            s.id === slot.id ? { ...s, status: 'reserved', ufid: username || 'None' } : s
+            s.id === slot.id ? { ...s, status: 'reserved', ufid: userId } : s
           )
         );
       }
@@ -87,9 +79,9 @@ export default function SlotList() {
     }
   };
 
-  const releaseSlot = async (slot: Slot) => {
+  const releaseSlot = async (slot: any) => {
     try {
-      const response = await fetch('http://localhost:3001/api/reserve', {
+      const response = await fetch(`${SERVER_URI}/api/reserve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,119 +100,107 @@ export default function SlotList() {
         );
       }
     } catch (err) {
-      console.error('Failed to free slot:', err);
+      console.error('Failed to release slot:', err);
     }
   };
 
-  const renderItem = ({ item }: { item: Slot }) => {
-    let text = 'Status Error';
-    let color = 'gray';
-
-    if (item.status === 'empty') {
-      text = 'Available';
-      color = 'green';
-    } else if (item.status === 'full') {
-      text = 'Not Available';
-      color = 'red';
-    } else if (item.status === 'reserved') {
-      text = 'Pending';
-      color = 'orange';
+  const triggerArduino = async (path: string) => {
+    try {
+      const response = await fetch(`http://10.136.10.226:3002/${path}`, {
+        method: 'GET',
+      });
+      console.log(`Arduino ${path} response:`, response);
+    } catch (err) {
+      console.error(`Failed to trigger Arduino ${path}:`, err);
     }
-
-    return (
-      <View style={styles.row}>
-        <Text style={styles.cell}>{item.id}</Text>
-        <Text style={[styles.cell, { color, fontWeight: 'bold' }]}>{text}</Text>
-        <Text style={styles.cell}>{item.ufid || 'None'}</Text>
-        <View style={styles.cell}>
-          {item.status === 'empty' ? (
-            <>
-              <TouchableOpacity onPress={() => reserveSlot(item)}>
-                <Text style={styles.icon}>🔒</Text>
-              </TouchableOpacity>
-              <Text style={[styles.icon, styles.inactive]}>🔓</Text>
-            </>
-          ) : (item.status === 'full' || item.status === 'reserved') &&
-            item.ufid === username ? (
-            <>
-              <Text style={[styles.icon, styles.inactive]}>🔒</Text>
-              <TouchableOpacity onPress={() => releaseSlot(item)}>
-                <Text style={styles.icon}>🔓</Text>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <Text style={[styles.icon, styles.inactive]}>🔒🔓</Text>
-          )}
-        </View>
-      </View>
-    );
   };
 
-  if (loading || username === null) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#333" />
-        <Text>Loading slots...</Text>
-      </View>
-    );
-  }
+  if (loading) return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Charger Slots</Text>
-      <View style={styles.tableHeader}>
-        <Text style={styles.cell}>Slot ID</Text>
-        <Text style={styles.cell}>Status</Text>
-        <Text style={styles.cell}>UFID</Text>
-        <Text style={styles.cell}>Reserve</Text>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Charger Slots</Text>
+      {slots.map((slot) => {
+        let text = 'Status Error';
+        let color = 'black';
+
+        if (slot.status === 'empty') {
+          text = 'Available';
+          color = 'green';
+        } else if (slot.status === 'full') {
+          text = 'Not Available';
+          color = 'red';
+        } else if (slot.status === 'reserved') {
+          text = 'Pending';
+          color = 'orange';
+        }
+
+        return (
+          <View key={slot.id} style={styles.slotBox}>
+            <Text>ID: {slot.id}</Text>
+            <Text style={{ color, fontWeight: 'bold' }}>{text}</Text>
+            <Text>Reserver: {slot.ufid || 'None'}</Text>
+            <View style={styles.controls}>
+              {slot.status === 'empty' ? (
+                <>
+                  <TouchableOpacity onPress={() => reserveSlot(slot)}>
+                    <Text style={styles.lock}>🔒</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.disabled}>🔓</Text>
+                </>
+              ) : (slot.status === 'full' || slot.status === 'reserved') &&
+                userId === slot.ufid ? (
+                <>
+                  <Text style={styles.disabled}>🔒</Text>
+                  <TouchableOpacity onPress={() => releaseSlot(slot)}>
+                    <Text style={styles.lock}>🔓</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <Text style={styles.disabled}>🔒🔓</Text>
+              )}
+            </View>
+          </View>
+        );
+      })}
+      <Button title="Unlock" onPress={() => triggerArduino('unlock')} />
+      <View style={{ marginTop: 10 }}>
+        <Button title="Lock" onPress={() => triggerArduino('lock')} />
       </View>
-      <FlatList
-        data={slots}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={renderItem}
-      />
-    </View>
+
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 16,
-    paddingTop: 50,
-  },
-  header: {
-    fontSize: 24,
-    marginBottom: 16,
-    textAlign: 'center',
-    fontWeight: 'bold',
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
-    paddingVertical: 8,
-  },
-  cell: {
-    flex: 1,
-    textAlign: 'center',
-  },
-  icon: {
-    fontSize: 20,
-    marginHorizontal: 4,
-  },
-  inactive: {
-    opacity: 0.3,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    paddingVertical: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  slotBox: {
+    marginBottom: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    width: '90%',
+    alignItems: 'center',
+  },
+  controls: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  lock: {
+    fontSize: 24,
+  },
+  disabled: {
+    fontSize: 24,
+    opacity: 0.3,
   },
 });

@@ -19,7 +19,7 @@ export async function checkToken() {
       return false;
     }
 
-    const res = await fetch("http://localhost:3001/api/tokenValidate", {
+    const res = await fetch(`${SERVER_URI}/api/tokenValidate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ token, username }),
