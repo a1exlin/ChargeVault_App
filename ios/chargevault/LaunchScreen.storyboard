@@ -23,7 +23,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" misplaced="YES" image="IMG_7816 2.PNG" translatesAutoresizingMaskIntoConstraints="NO" id="pBb-Mf-7Ff">
-                                <rect key="frame" x="0.0" y="62" width="440" height="922"/>
+                                <rect key="frame" x="0.0" y="0.0" width="440" height="956"/>
                                 <color key="backgroundColor" red="0.65736960714796033" green="0.80204481602404365" blue="0.88716357946395874" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             </imageView>
                         </subviews>
@@ -42,7 +42,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iYj-Kq-Ea1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="52.173913043478265" y="375"/>
+            <point key="canvasLocation" x="51.81818181818182" y="374.68619246861925"/>
         </scene>
     </scenes>
     <resources>
