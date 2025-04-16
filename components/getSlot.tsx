@@ -1,51 +1,66 @@
 import React, { useEffect, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  StyleSheet,
-  ActivityIndicator,
-  Button,
-} from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import { SERVER_URI } from '@env';
-import { checkToken } from './utils/auth';
+import { useNavigation } from '@react-navigation/native';
 
-export default function ReserveSlot() {
-  const [slots, setSlots] = useState<any[]>([]);
+interface Slot {
+  id: number;
+  status: string;
+  ufid?: string;
+}
+
+export default function ReserveSlotScreen() {
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation<any>();
-  const [userId, setUserId] = useState('');
+  const navigation = useNavigation();
 
   useEffect(() => {
-    const runTokenCheck = async () => {
-      const isValid = await checkToken();
-      const username = await AsyncStorage.getItem('username');
-      setUserId(username || '');
+    const validateToken = async () => {
+      const token = await AsyncStorage.getItem('token');
+      const storedUsername = await AsyncStorage.getItem('username');
 
-      if (!isValid) {
-        navigation.navigate('Login');
+      if (!token || !storedUsername) {
+        navigation.navigate('Login' as never);
+        return;
+      }
+
+      try {
+        const res = await fetch(`${SERVER_URI}/api/tokenValidate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, username: storedUsername }),
+        });
+
+        const data = await res.json();
+        if (!res.ok || data.message !== 'Success') {
+          await AsyncStorage.clear();
+          navigation.navigate('Login' as never);
+        } else {
+          setUsername(storedUsername);
+        }
+      } catch (err) {
+        console.error('Token validation error:', err);
+        navigation.navigate('Login' as never);
       }
     };
 
-    runTokenCheck();
-  }, []);
+    validateToken();
+  }, [navigation]);
 
   useEffect(() => {
     const fetchSlots = async () => {
       try {
-        const response = await fetch(`${SERVER_URI}/api/getSlots`, {
+        const res = await fetch(`${SERVER_URI}/api/getSlots`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         });
-        const data = await response.json();
-        setSlots(data);
-      } catch (error) {
-        console.error('Failed to fetch slots:', error);
+        const data = await res.json();
+        console.log('Fetched slots:', data);
+        setSlots(data); // <- updated here
+      } catch (err) {
+        console.error('Failed to fetch slots:', err);
       } finally {
         setLoading(false);
       }
@@ -54,34 +69,30 @@ export default function ReserveSlot() {
     fetchSlots();
   }, []);
 
-  const reserveSlot = async (slot: any) => {
+  const reserveSlot = async (slot: Slot) => {
     try {
-      const response = await fetch(`${SERVER_URI}/api/reserve`, {
+      await fetch(`${SERVER_URI}/api/reserve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ufid: userId,
+          ufid: username,
           slotID: slot.id,
           status: 'reserved',
         }),
       });
 
-      const result = await response.json();
-      if (result.success) {
-        setSlots((prev) =>
-          prev.map((s) =>
-            s.id === slot.id ? { ...s, status: 'reserved', ufid: userId } : s
-          )
-        );
-      }
+      await fetch(`http://10.136.10.226:3002/reserve${slot.id}`);
+      setSlots(prev =>
+        prev.map(s => (s.id === slot.id ? { ...s, status: 'reserved', ufid: username || '' } : s))
+      );
     } catch (err) {
-      console.error('Failed to reserve slot:', err);
+      console.error('Reservation failed:', err);
     }
   };
 
-  const releaseSlot = async (slot: any) => {
+  const releaseSlot = async (slot: Slot) => {
     try {
-      const response = await fetch(`${SERVER_URI}/api/reserve`, {
+      await fetch(`${SERVER_URI}/api/reserve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -91,84 +102,84 @@ export default function ReserveSlot() {
         }),
       });
 
-      const result = await response.json();
-      if (result.success) {
-        setSlots((prev) =>
-          prev.map((s) =>
-            s.id === slot.id ? { ...s, status: 'empty', ufid: 'None' } : s
-          )
-        );
-      }
+      await fetch(`http://10.136.10.226:3002/unreserve${slot.id}`);
+      setSlots(prev =>
+        prev.map(s => (s.id === slot.id ? { ...s, status: 'empty', ufid: 'None' } : s))
+      );
     } catch (err) {
-      console.error('Failed to release slot:', err);
+      console.error('Release failed:', err);
     }
   };
 
-  const triggerArduino = async (path: string) => {
+  const triggerArduinoUnlock = async () => {
     try {
-      const response = await fetch(`http://10.136.10.226:3002/${path}`, {
-        method: 'GET',
-      });
-      console.log(`Arduino ${path} response:`, response);
+      const response = await fetch('http://10.136.10.226:3002/unlock');
+      console.log('Unlocked:', await response.text());
     } catch (err) {
-      console.error(`Failed to trigger Arduino ${path}:`, err);
+      console.error('Unlock error:', err);
     }
   };
 
-  if (loading) return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+  const triggerArduinoLock = async () => {
+    try {
+      const response = await fetch('http://10.136.10.226:3002/lock');
+      console.log('Locked:', await response.text());
+    } catch (err) {
+      console.error('Lock error:', err);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Charger Slots</Text>
-      {slots.map((slot) => {
-        let text = 'Status Error';
-        let color = 'black';
 
-        if (slot.status === 'empty') {
-          text = 'Available';
-          color = 'green';
-        } else if (slot.status === 'full') {
-          text = 'Not Available';
-          color = 'red';
-        } else if (slot.status === 'reserved') {
-          text = 'Pending';
-          color = 'orange';
-        }
+      {Array.isArray(slots) && slots.map(slot => {
+        const color = slot.status === 'reserved' ? 'orange' : 'gray';
+        const label = `ID: ${slot.id}`;
+        const statusLabel =
+          slot.status === 'empty'
+            ? 'Available'
+            : slot.status === 'reserved'
+            ? 'Pending'
+            : 'Unavailable';
 
         return (
           <View key={slot.id} style={styles.slotBox}>
-            <Text>ID: {slot.id}</Text>
-            <Text style={{ color, fontWeight: 'bold' }}>{text}</Text>
+            <Text style={{ color, fontWeight: 'bold' }}>{label}</Text>
+            <Text>Status: {statusLabel}</Text>
             <Text>Reserver: {slot.ufid || 'None'}</Text>
-            <View style={styles.controls}>
+
+            <View style={styles.lockIcons}>
               {slot.status === 'empty' ? (
                 <>
                   <TouchableOpacity onPress={() => reserveSlot(slot)}>
-                    <Text style={styles.lock}>🔒</Text>
+                    <Text style={styles.lockButton}>🔒</Text>
                   </TouchableOpacity>
-                  <Text style={styles.disabled}>🔓</Text>
-                </>
-              ) : (slot.status === 'full' || slot.status === 'reserved') &&
-                userId === slot.ufid ? (
-                <>
-                  <Text style={styles.disabled}>🔒</Text>
-                  <TouchableOpacity onPress={() => releaseSlot(slot)}>
-                    <Text style={styles.lock}>🔓</Text>
-                  </TouchableOpacity>
+                  <Text style={styles.disabledIcon}>🔓</Text>
                 </>
               ) : (
-                <Text style={styles.disabled}>🔒🔓</Text>
+                <>
+                  <Text style={styles.disabledIcon}>🔒</Text>
+                  {slot.ufid === username ? (
+                    <TouchableOpacity onPress={() => releaseSlot(slot)}>
+                      <Text style={styles.lockButton}>🔓</Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <Text style={styles.disabledIcon}>🔓</Text>
+                  )}
+                </>
               )}
             </View>
           </View>
-          
         );
       })}
-        <View style={{flexDirection:'row', marginBottom: 20, backgroundColor: 'lightblue', borderRadius: 5,}}>
-        <Button title="Unlock" onPress={() => triggerArduino('unlock')} />
-        <Button title="Lock" onPress={() => triggerArduino('lock')} />
-      </View>
 
+      <TouchableOpacity style={styles.button} onPress={triggerArduinoUnlock}>
+        <Text style={styles.buttonText}>Unlock</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={triggerArduinoLock}>
+        <Text style={styles.buttonText}>Lock</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -177,7 +188,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     paddingVertical: 20,
-    marginTop: 20,
+    paddingHorizontal: 10,
   },
   title: {
     fontSize: 24,
@@ -185,24 +196,38 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   slotBox: {
-    marginBottom: 20,
-    padding: 16,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
+    padding: 16,
+    marginBottom: 15,
     width: '90%',
     alignItems: 'center',
   },
-  controls: {
+  lockIcons: {
     flexDirection: 'row',
-    gap: 10,
     marginTop: 10,
   },
-  lock: {
+  lockButton: {
     fontSize: 24,
+    color: '#333',
+    marginHorizontal: 10,
   },
-  disabled: {
+  disabledIcon: {
     fontSize: 24,
-    opacity: 0.3,
+    color: '#ccc',
+    marginHorizontal: 10,
+  },
+  button: {
+    backgroundColor: '#0020aa',
+    borderRadius: 6,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginTop: 15,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
+
