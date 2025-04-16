@@ -37,6 +37,13 @@ export default function AccessHistoryScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Login History</Text>
+
+      <View style={styles.headerRow}>
+        <Text style={styles.headerCell}>Username</Text>
+        <Text style={styles.headerCell}>Time</Text>
+        <Text style={styles.headerCell}>IP</Text>
+      </View>
+
       <FlatList
         data={logs}
         keyExtractor={(_, index) => index.toString()}
@@ -68,12 +75,25 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginTop: 50,
+    marginTop: 40,
+    marginBottom: 10,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    backgroundColor: '#0066cc',
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+  },
+  headerCell: {
+    flex: 1,
+    color: '#ffffff',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   row: {
     flexDirection: 'row',
     paddingVertical: 12,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     borderBottomWidth: 1,
     borderColor: '#eee',
   },
