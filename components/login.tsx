@@ -30,7 +30,7 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     setLoginError('');
     try {
-      const res = await fetch('http://10.91.245.203:3001/login', {
+      const res = await fetch('http://10.91.214.217:3001/login', {
         // Use 10.0.2.2 for Android emulator, or your computer IP if on real device
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
