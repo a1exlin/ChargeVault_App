@@ -1,3 +1,4 @@
+import {SERVER_URI} from '@env';
 import React, { useState } from 'react';
 import {
   View,
@@ -16,7 +17,7 @@ export default function SignupScreen() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch('http://10.91.214.217:3001/signup', {
+      const res = await fetch(`${SERVER_URI}/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

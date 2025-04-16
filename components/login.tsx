@@ -1,49 +1,66 @@
+import { SERVER_URI } from '@env';
 import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  Alert,
   StyleSheet,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import { checkToken } from './utils/auth'; // adjust path as needed
+import { checkToken } from './utils/auth';
+
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
+
 
   useEffect(() => {
     const runTokenCheck = async () => {
+      console.log('Checking token...');
       const isValid = await checkToken();
       if (isValid) {
-        navigation.navigate('Home' as never);
+        console.log('Token is valid. Navigating to Home.');
+        navigation.navigate('Home');
+      } else {
+        console.log('Token is invalid or not found.');
       }
     };
+
+
     runTokenCheck();
   }, []);
 
+
   const handleLogin = async () => {
     setLoginError('');
+
+
+    console.log('SERVER_URI:', SERVER_URI); // Confirm .env is working
+
+
     try {
-      const res = await fetch('http://10.91.214.217:3001/login', {
-        // Use 10.0.2.2 for Android emulator, or your computer IP if on real device
+      const res = await fetch(`${SERVER_URI}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
 
+
       const data = await res.json();
+
 
       if (res.ok && data.message === 'Success') {
         await AsyncStorage.setItem('token', data.token);
         await AsyncStorage.setItem('username', data.username);
+        console.log('Token and username stored:', data.token, data.username);
 
-        navigation.navigate('Home' as never);
+
+        navigation.navigate('Home');
       } else {
         setLoginError(data.message || 'Login failed');
       }
@@ -53,9 +70,11 @@ export default function LoginScreen() {
     }
   };
 
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>CHARGEVault</Text>
+
 
       <TextInput
         placeholder="Username"
@@ -65,6 +84,7 @@ export default function LoginScreen() {
         autoCapitalize="none"
       />
 
+
       <TextInput
         placeholder="Password"
         value={password}
@@ -73,19 +93,23 @@ export default function LoginScreen() {
         secureTextEntry
       />
 
+
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Login</Text>
       </TouchableOpacity>
 
+
       {loginError ? <Text style={styles.errorText}>{loginError}</Text> : null}
 
+
       <Text style={styles.signupText}>Don’t have an account?</Text>
-      <TouchableOpacity onPress={() => navigation.navigate('Signup' as never)}>
+      <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
         <Text style={styles.signupLink}>Sign Up</Text>
       </TouchableOpacity>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -137,3 +161,4 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
 });
+

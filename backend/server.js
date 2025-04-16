@@ -1,5 +1,4 @@
 require("dotenv").config();
-
 const express = require("express");
 const http = require("http");
 const cors = require("cors");
@@ -31,6 +30,14 @@ app.use("/api", require("./routes/tokenValidate"));
 app.use("/api", require("./routes/arduino/slots"));
 app.use("/api", require("./routes/Reservations"));
 
+//Port
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
+});
+
+
 // Start server only after DB connects
 mongoose
   .connect(process.env.MONGO_URI)
@@ -43,12 +50,11 @@ mongoose
 
     require("./utils/ReservationTimeout");
 
-    const PORT = process.env.PORT || 3001;
-    server.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
-    });
+ 
   })
   .catch((err) => {
     console.error("MongoDB connection error:", err);
     process.exit(1); // Optional: exit if DB fails
   });
+
+

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		1922D1282DAF343F00357554 /* IMG_7816 2.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 1922D1272DAF343F00357554 /* IMG_7816 2.PNG */; };
+		198B45AF2DAF739800BC1622 /* logo.PNG in Resources */ = {isa = PBXBuildFile; fileRef = 198B45AE2DAF739800BC1622 /* logo.PNG */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8DA28893E2DFBBE59AF85724 /* libPods-chargevault.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 514788AC8097CAAFA2D22D89 /* libPods-chargevault.a */; };
@@ -21,8 +21,8 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = chargevault/Info.plist; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = chargevault/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		154BE7DFB2269A0870D25148 /* Pods-chargevault.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chargevault.release.xcconfig"; path = "Target Support Files/Pods-chargevault/Pods-chargevault.release.xcconfig"; sourceTree = "<group>"; };
-		1922D1272DAF343F00357554 /* IMG_7816 2.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "IMG_7816 2.PNG"; sourceTree = "<group>"; };
 		197B865A2DAE31BD009779C9 /* chargevault.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = chargevault.entitlements; path = chargevault/chargevault.entitlements; sourceTree = "<group>"; };
+		198B45AE2DAF739800BC1622 /* logo.PNG */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.PNG; sourceTree = "<group>"; };
 		29AD32A3C9DD1B782F67524A /* Pods-chargevault.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chargevault.debug.xcconfig"; path = "Target Support Files/Pods-chargevault/Pods-chargevault.debug.xcconfig"; sourceTree = "<group>"; };
 		514788AC8097CAAFA2D22D89 /* libPods-chargevault.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-chargevault.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = chargevault/AppDelegate.swift; sourceTree = "<group>"; };
@@ -45,12 +45,12 @@
 		13B07FAE1A68108700A75B9A /* chargevault */ = {
 			isa = PBXGroup;
 			children = (
+				198B45AE2DAF739800BC1622 /* logo.PNG */,
 				197B865A2DAE31BD009779C9 /* chargevault.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
-				1922D1272DAF343F00357554 /* IMG_7816 2.PNG */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 			);
 			name = chargevault;
@@ -163,7 +163,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1922D1282DAF343F00357554 /* IMG_7816 2.PNG in Resources */,
+				198B45AF2DAF739800BC1622 /* logo.PNG in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				C91A69DA7631FAA793D22889 /* PrivacyInfo.xcprivacy in Resources */,
@@ -187,7 +187,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+			shellScript = "export NODE_BINARY=/opt/homebrew/bin/node\nset -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n\n\n";
 		};
 		6D75AF3919DC1923319983A4 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
