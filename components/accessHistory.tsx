@@ -1,102 +1,102 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet } from "react-native";
-import { SERVER_URI } from "@env";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import { SERVER_URI } from '@env';
 
-// Define the structure of each log entry
-type AccessLog = {
-  username: string;
-  rfid: string;
-  location?: string;
-  time: number;
-};
-
-export default function AccessHistory() {
-  const [logs, setLogs] = useState<AccessLog[]>([]);
+export default function AccessHistoryScreen() {
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await fetch(`${SERVER_URI}/api/getLogs`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const response = await fetch(`${SERVER_URI}/api/getLoginLogs`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
         });
         const data = await response.json();
         setLogs(data);
       } catch (error) {
-        console.error("Failed to fetch logs:", error);
+        console.error('Failed to fetch login logs:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchLogs();
   }, []);
 
-  return (
-    <ScrollView style={styles.wrapper}>
-      <Text style={styles.heading}>Access Logs</Text>
-
-      <View style={styles.rowHeader}>
-        <Text style={styles.cellHeader}>Username</Text>
-        <Text style={styles.cellHeader}>RFID</Text>
-        <Text style={styles.cellHeader}>Location</Text>
-        <Text style={styles.cellHeader}>Time</Text>
+  if (loading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#0066cc" />
+        <Text style={{ marginTop: 10 }}>Loading logs...</Text>
       </View>
+    );
+  }
 
-      {logs.map((log, index) => (
-        <View
-          key={index}
-          style={[styles.row, index % 2 === 0 ? styles.evenRow : styles.oddRow]}
-        >
-          <Text style={styles.cell}>{log.username}</Text>
-          <Text style={styles.cell}>{log.rfid}</Text>
-          <Text style={styles.cell}>{log.location || "—"}</Text>
-          <Text style={styles.cell}>
-            {new Date(log.time * 1000).toLocaleString()}
-          </Text>
-        </View>
-      ))}
-    </ScrollView>
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>Login History</Text>
+      <FlatList
+        data={logs}
+        keyExtractor={(_, index) => index.toString()}
+        ListEmptyComponent={<Text style={styles.noData}>No logs found</Text>}
+        renderItem={({ item, index }) => {
+          const readTime = new Date(item.time * 1000).toLocaleString();
+          const rowStyle = index % 2 === 0 ? styles.evenRow : styles.oddRow;
+
+          return (
+            <View style={[styles.row, rowStyle]}>
+              <Text style={styles.cell}>{item.username}</Text>
+              <Text style={styles.cell}>{readTime}</Text>
+              <Text style={styles.cell}>{item.ip}</Text>
+            </View>
+          );
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
+    padding: 20,
+    backgroundColor: '#fff',
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
-    marginTop: 50,
   },
   heading: {
     fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 16,
-  },
-  rowHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    backgroundColor: "#0066cc",
-    padding: 10,
-  },
-  cellHeader: {
-    color: "white",
-    fontWeight: "bold",
-    flex: 1,
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 50,
   },
   row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 10,
+    flexDirection: 'row',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderBottomWidth: 1,
+    borderColor: '#eee',
   },
   evenRow: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: '#f9f9f9',
   },
   oddRow: {
-    backgroundColor: "#ffffff",
+    backgroundColor: '#ffffff',
   },
   cell: {
     flex: 1,
-    textAlign: "center",
     fontSize: 14,
+    textAlign: 'center',
+  },
+  noData: {
+    textAlign: 'center',
+    marginTop: 20,
+    fontStyle: 'italic',
+    color: '#666',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
