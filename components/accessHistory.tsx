@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { SERVER_URI } from "@env";
 
 // Define the structure of each log entry
 type AccessLog = {
@@ -15,7 +16,7 @@ export default function AccessHistory() {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/getLogs", {
+        const response = await fetch(`${SERVER_URI}/api/getLogs`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
         });

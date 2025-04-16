@@ -4,6 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { checkToken } from './utils/auth';
 import { RootStackParamList } from './navigation';
+import { Image } from 'react-native';
+import Logo from './imgs/logo.png'
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -23,6 +25,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.panel}>
+        <Image source={Logo} style={{width: 150, height: 150, borderRadius: 10, }}></Image>
         <Text style={styles.heading}>Home</Text>
         <Text style={styles.text}>
           You are signed into: {"\n"}
@@ -46,12 +49,16 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 40,
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: '#d6ecf7',
+    alignItems: 'center',
   },
   panel: {
     marginTop: 60,
+    padding: 20,
+    backgroundColor: '#c3dbe5',
+    borderRadius: 40,
   },
   heading: {
     fontSize: 24,
@@ -70,6 +77,8 @@ const styles = StyleSheet.create({
     marginBottom: 50,
     flexDirection: 'row',
     justifyContent: 'space-around',
+    backgroundColor: '#0c3c60',
+
   },
 });
 

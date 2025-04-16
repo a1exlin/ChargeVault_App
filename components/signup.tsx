@@ -9,6 +9,8 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Image } from 'react-native';
+import Logo from './imgs/logo.png';
 
 export default function SignupScreen() {
   const [username, setUsername] = useState('');
@@ -38,6 +40,7 @@ export default function SignupScreen() {
 
   return (
     <View style={styles.container}>
+      <Image source={Logo} alt='logo-pic' style={{width: 100, height: 100, borderRadius: 10,}}></Image>
       <Text style={styles.title}>CHARGEVault</Text>
 
       <TextInput
@@ -46,6 +49,7 @@ export default function SignupScreen() {
         onChangeText={setUsername}
         style={styles.input}
         autoCapitalize="none"
+        placeholderTextColor='black'
       />
 
       <TextInput
@@ -54,6 +58,7 @@ export default function SignupScreen() {
         onChangeText={setPassword}
         style={styles.input}
         secureTextEntry
+        placeholderTextColor='black'
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSubmit}>
