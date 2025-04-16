@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-nati
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SERVER_URI } from '@env';
 import { useNavigation } from '@react-navigation/native';
+import { ScreenStackHeaderRightView } from 'react-native-screens';
 
 interface Slot {
   id: number;
@@ -140,14 +141,28 @@ export default function ReserveSlotScreen() {
           slot.status === 'empty'
             ? 'Available'
             : slot.status === 'reserved'
-            ? 'Pending'
-            : 'Unavailable';
+              ? 'Pending'
+              : 'Unavailable';
+
+        let schargedStatus = "";
+
+        if (slot.status === "reserved") {
+          schargedStatus = "Charging...";
+        } else if (slot.status === "full") {
+          schargedStatus = "Charged";
+
+        } else {
+          schargedStatus = "No Battery";
+        }
+
+        const chargedStatus = schargedStatus;
 
         return (
           <View key={slot.id} style={styles.slotBox}>
             <Text style={{ color, fontWeight: 'bold' }}>{label}</Text>
             <Text>Status: {statusLabel}</Text>
             <Text>Reserver: {slot.ufid || 'None'}</Text>
+            <Text>Level: {chargedStatus}</Text>
 
             <View style={styles.lockIcons}>
               {slot.status === 'empty' ? (
@@ -174,12 +189,15 @@ export default function ReserveSlotScreen() {
         );
       })}
 
-      <TouchableOpacity style={styles.button} onPress={triggerArduinoUnlock}>
-        <Text style={styles.buttonText}>Unlock</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={triggerArduinoLock}>
-        <Text style={styles.buttonText}>Lock</Text>
-      </TouchableOpacity>
+      <View style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={triggerArduinoUnlock}>
+          <Text style={styles.buttonText}>Unlock</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={triggerArduinoLock}>
+          <Text style={styles.buttonText}>Lock</Text>
+        </TouchableOpacity>
+      </View>
+
     </ScrollView>
   );
 }
@@ -189,6 +207,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
     paddingHorizontal: 10,
+    marginTop: 30,
   },
   title: {
     fontSize: 24,
@@ -221,9 +240,14 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: '#0020aa',
     borderRadius: 6,
-    paddingVertical: 12,
+    paddingVertical: 5,
     paddingHorizontal: 20,
-    marginTop: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 15
+   
+    
+
   },
   buttonText: {
     color: '#fff',
