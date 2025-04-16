@@ -25,11 +25,12 @@ router.post("/login", async (req, res) => {
     const ip = req.headers['x-fowarded-for']?.split(',').shift() || 
     req.socket?.remoteAddress;
 
-    loginHistory.insertOne({
-      username: user.username,
-      time: time,
-      ip: ip,
-    })
+       // Log access event
+       await loginHistory.create({
+        username: user.username,
+        time: time,
+        ip: ip,
+      });
 
     res
       .status(200)
