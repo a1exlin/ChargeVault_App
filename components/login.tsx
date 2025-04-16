@@ -42,7 +42,6 @@ export default function LoginScreen() {
 
     console.log('SERVER_URI:', SERVER_URI); // Confirm .env is working
 
-
     try {
       const res = await fetch(`${SERVER_URI}/login`, {
         method: 'POST',
