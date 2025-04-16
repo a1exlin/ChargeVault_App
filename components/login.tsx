@@ -10,7 +10,8 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { checkToken } from './utils/auth';
-
+import Logo from './imgs/logo.png';
+import { Image } from 'react-native';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -72,6 +73,7 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <Image source={Logo} alt='logo-pic' style={{width: 100, height: 100, borderRadius: 10,}}></Image>
       <Text style={styles.title}>CHARGEVault</Text>
 
 
@@ -81,6 +83,7 @@ export default function LoginScreen() {
         onChangeText={setUsername}
         style={styles.input}
         autoCapitalize="none"
+        placeholderTextColor='black'
       />
 
 
@@ -90,6 +93,7 @@ export default function LoginScreen() {
         onChangeText={setPassword}
         style={styles.input}
         secureTextEntry
+        placeholderTextColor='black'
       />
 
 

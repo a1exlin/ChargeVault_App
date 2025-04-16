@@ -163,8 +163,12 @@ export default function ReserveSlot() {
           </View>
         );
       })}
-      <Button title="Unlock" onPress={() => triggerArduino('unlock')} />
-      <View style={{ marginTop: 10 }}>
+
+      <View style={{ marginTop: 10, backgroundColor: 'navy', borderRadius: 5, }}>
+        <Button title="Unlock" onPress={() => triggerArduino('unlock')} />
+      </View>
+
+      <View style={{ marginTop: 10, backgroundColor:'navy', borderRadius: 5,}}>
         <Button title="Lock" onPress={() => triggerArduino('lock')} />
       </View>
 
