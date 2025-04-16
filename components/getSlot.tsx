@@ -161,14 +161,11 @@ export default function ReserveSlot() {
               )}
             </View>
           </View>
+          
         );
       })}
-
-      <View style={{ marginTop: 10, backgroundColor: 'navy', borderRadius: 5, }}>
+        <View style={{flexDirection:'row', marginBottom: 20, backgroundColor: 'lightblue', borderRadius: 5,}}>
         <Button title="Unlock" onPress={() => triggerArduino('unlock')} />
-      </View>
-
-      <View style={{ marginTop: 10, backgroundColor:'navy', borderRadius: 5,}}>
         <Button title="Lock" onPress={() => triggerArduino('lock')} />
       </View>
 
@@ -180,6 +177,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     paddingVertical: 20,
+    marginTop: 20,
   },
   title: {
     fontSize: 24,
