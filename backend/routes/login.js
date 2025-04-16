@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const User = require("../models/User");
+const User = require("../models/user");
+const loginHistory = require("../models/loginHistory");
 
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -19,6 +20,16 @@ router.post("/login", async (req, res) => {
     const newToken = generateToken();
 
     await User.updateOne({ username }, { $set: { token: newToken } });
+
+    const time = Math.floor(Date.now() / 1000);
+    const ip = req.headers['x-fowarded-for']?.split(',').shift() || 
+    req.socket?.remoteAddress;
+
+    loginHistory.insertOne({
+      username: user.username,
+      time: time,
+      ip: ip,
+    })
 
     res
       .status(200)
