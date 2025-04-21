@@ -23,7 +23,7 @@ The following list are required for this App to render properly
  - In .env file from ChargeVault_App (not the backend .env file) change the localIP to your IP
 
 
-<img src="![IMG_1368](https://github.com/user-attachments/assets/b96fbdd5-1827-40a1-938e-e89ecbaec19a)" width="400"/>
+<img src="https://github.com/user-attachments/assets/b96fbdd5-1827-40a1-938e-e89ecbaec19a" width="400"/>
 
 
 
