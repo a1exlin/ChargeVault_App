@@ -31,6 +31,7 @@ App Screenshots
 <img src="https://github.com/user-attachments/assets/b96fbdd5-1827-40a1-938e-e89ecbaec19a" width="400"/>
 
 Website Screenshots
+
 <img width="1440" alt="Screenshot 2025-04-21 at 3 25 18 AM" src="https://github.com/user-attachments/assets/2e688fb6-9ec2-41ad-8317-70ca4e3e8a61" />
 <img width="1440" alt="Screenshot 2025-04-21 at 3 24 36 AM" src="https://github.com/user-attachments/assets/7e39e6bc-8a2e-4e5f-ae1c-df49f449643e" />
 <img width="1440" alt="Screenshot 2025-04-21 at 3 25 13 AM" src="https://github.com/user-attachments/assets/95f12751-a51e-43f1-b6f7-c2baa30ad39d" />
