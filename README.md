@@ -24,6 +24,7 @@ The following list are required for this App to render properly
 
 ## Screenshots
 App Screenshots
+
 <img src="https://github.com/user-attachments/assets/7786b898-d08b-46b2-a304-aa9fd5ee2b7d" width="400"/>
 <img src="https://github.com/user-attachments/assets/061bd65b-f045-408e-a855-c8bf9b1f5ca3" width="400"/>
 <img src="https://github.com/user-attachments/assets/04b11ad0-db32-4728-b339-6d3a6cc32a6d" width="400"/>
