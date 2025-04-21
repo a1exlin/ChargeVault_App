@@ -6,8 +6,8 @@ We have render a basic application on ios platform to view. This project suceeds
 - A secured Login and Signup where users token and cookies on local storage are managed properly
 - Mongo DB Cloud used to store user data
 - Locking/Unlock system on the vault is connected through arduino, and rasberry pi which sends data to this app
-- reserve/unreserve slots 1-9 for power drill battery slots
-- login history tab to see user logins, time, and IP address
+- Reserve/Unreserve slots 1-9 for power drill battery slots
+- Login history tab to see user logins, time, and IP address
 
 ## Installations
 The following list are required for this App to render properly
@@ -17,8 +17,8 @@ The following list are required for this App to render properly
  - git clone and install dependencies for ChargeVault in a1exlin repos. 
  - run backend server (npm start)
  - Xcode
- - properly set up developer from ios device 
- - run build on Xcode to ios device
+ - Properly set up developer from ios device 
+ - Run build on Xcode to ios device
  - In Charge_Vault_App run: npx react-native start (this runs the metro)
  - In .env file from ChargeVault_App (not the backend .env file) change the localIP to your IP
 
